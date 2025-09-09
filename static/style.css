@@ -1,0 +1,595 @@
+/* static/style.css — Стили для публичной страницы расписания FPV Training Platform */
+
+/* ========================
+   ОБЩИЕ СТИЛИ
+======================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ========================
+   ЗАГОЛОВКИ
+======================== */
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.last-updated {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.auto-update {
+    text-align: center;
+    color: #95a5a6;
+    margin: 20px 0 40px;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* ========================
+   ГОРОДА И СЕКЦИИ
+======================== */
+
+.city-section {
+    margin-bottom: 50px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.city-title {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 20px;
+    border-radius: 15px 15px 0 0;
+    margin: 0 -40px 0 -40px;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.city-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #f1c40f, #e67e22, #e74c3c);
+}
+
+/* ========================
+   КАРТОЧКИ ТРЕНИРОВОК
+======================== */
+
+.training-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-left: 5px solid #27ae60;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.training-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.training-card.past {
+    opacity: 0.7;
+    border-left-color: #e74c3c;
+    background: #fdf2f2;
+}
+
+.training-card.past::before {
+    content: 'Завершено';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.header h2, .header h3 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.header h3 {
+    font-size: 1.3em;
+}
+
+.meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.meta span {
+    background: #ecf0f1;
+    padding: 8px 15px;
+    border-radius: 25px;
+    font-size: 0.9em;
+    color: #7f8c8d;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.meta span:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.meta .date { background: #34495e; color: white; }
+.meta .time { background: #2ecc71; color: white; }
+.meta .track { background: #9b59b6; color: white; font-weight: 600; }
+.meta .spots { background: #e67e22; color: white; }
+
+/* Стили для треков */
+.track.race { background: #e74c3c !important; }
+.track.freestyle { background: #3498db !important; }
+.track.low { background: #9b59b6 !important; }
+.track.tech { background: #2ecc71 !important; }
+.track.cinematic { background: #1abc9c !important; }
+.track.training { background: #f1c40f !important; color: #2c3e50 !important; }
+.track.other { background: #95a5a6 !important; }
+
+/* ========================
+   ТАБЛИЦЫ ПИЛОТОВ
+======================== */
+
+.pilots-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.pilots-table th,
+.pilots-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.pilots-table th {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9em;
+}
+
+.pilots-table tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+.pilots-table tr:hover {
+    background: #e3f2fd;
+}
+
+.channel {
+    font-weight: bold;
+    color: #e67e22;
+    font-size: 1.1em;
+}
+
+.paid-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+    background: #2ecc71;
+    margin-left: 8px;
+}
+
+/* ========================
+   СООБЩЕНИЯ
+======================== */
+
+.no-pilots {
+    text-align: center;
+    color: #95a5a6;
+    font-style: italic;
+    padding: 30px;
+    font-size: 1.1em;
+    background: #fafafa;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px dashed #ecf0f1;
+}
+
+.no-trainings {
+    text-align: center;
+    padding: 60px 20px;
+    color: #e74c3c;
+    font-size: 1.4em;
+    font-weight: 500;
+    background: #fdf2f2;
+    border-radius: 15px;
+    margin: 40px 0;
+    border: 2px solid #f5c6cb;
+}
+
+/* ========================
+   КНОПКИ И ССЫЛКИ
+======================== */
+
+.admin-link {
+    display: block;
+    text-align: center;
+    background: #3498db;
+    color: white;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 40px auto 0;
+    max-width: 300px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.admin-link:hover {
+    background: #2980b9;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+}
+
+/* ========================
+   ФИЛЬТРЫ
+======================== */
+
+.filters {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin: 30px 0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.filters label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 15px;
+    font-size: 1.1em;
+}
+
+.filters select {
+    padding: 12px 20px;
+    border: 2px solid #ecf0f1;
+    border-radius: 25px;
+    background: white;
+    color: #2c3e50;
+    font-size: 1em;
+    cursor: pointer;
+    min-width: 250px;
+    transition: all 0.3s ease;
+}
+
+.filters select:hover {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* ========================
+   FOOTER
+======================== */
+
+footer {
+    margin-top: 60px;
+    text-align: center;
+    padding: 30px 0;
+    color: #7f8c8d;
+    font-size: 0.9em;
+    border-top: 1px solid #ecf0f1;
+}
+
+footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* ========================
+   АДАПТИВНЫЙ ДИЗАЙН
+======================== */
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 25px;
+        margin: 10px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .city-title {
+        font-size: 1.5em;
+        padding: 15px;
+        margin: 0 -25px 0 -25px;
+    }
+    
+    .training-card {
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .header h2, .header h3 {
+        font-size: 1.3em;
+    }
+    
+    .meta {
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .meta span {
+        padding: 6px 12px;
+        font-size: 0.85em;
+    }
+    
+    .pilots-table th,
+    .pilots-table td {
+        padding: 12px 10px;
+        font-size: 0.9em;
+    }
+    
+    .admin-link {
+        padding: 12px 25px;
+        font-size: 1em;
+        margin: 30px auto 0;
+    }
+    
+    .filters {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .filters select {
+        min-width: 200px;
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
+    
+    footer {
+        margin-top: 40px;
+        padding: 20px 0;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+        margin: 5px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .city-title {
+        font-size: 1.3em;
+        padding: 12px;
+    }
+    
+    .training-card {
+        padding: 15px;
+    }
+    
+    .header h2, .header h3 {
+        font-size: 1.2em;
+    }
+    
+    .meta span {
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+    
+    .pilots-table th,
+    .pilots-table td {
+        padding: 10px 8px;
+        font-size: 0.85em;
+    }
+    
+    .admin-link {
+        padding: 10px 20px;
+        font-size: 0.95em;
+        margin: 25px auto 0;
+    }
+    
+    .filters select {
+        min-width: 100%;
+        margin-top: 10px;
+    }
+}
+
+/* ========================
+   АНИМАЦИИ
+======================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.training-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.city-section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Плавное появление при HTMX-обновлении */
+#schedule-container {
+    transition: opacity 0.3s ease;
+}
+
+#schedule-container.htmx-swapping {
+    opacity: 0.7;
+}
+
+/* ========================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ
+======================== */
+
+/* Стиль для QR-кода и ссылки */
+.qr-section {
+    text-align: center;
+    margin: 40px 0;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.qr-section img {
+    max-width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.qr-section img:hover {
+    transform: scale(1.05);
+}
+
+.qr-section a {
+    color: #3498db;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.2em;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.qr-section a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Стиль для политики конфиденциальности */
+.privacy-section {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 40px 0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    line-height: 1.8;
+}
+
+.privacy-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.privacy-section p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.privacy-section ul {
+    margin: 20px 0;
+    padding-left: 30px;
+}
+
+.privacy-section li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}

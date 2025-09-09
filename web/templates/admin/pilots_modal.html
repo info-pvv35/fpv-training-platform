@@ -1,0 +1,488 @@
+<!-- templates/admin/pilots_modal.html -->
+<div class="pilots-modal-content">
+    <div class="modal-header">
+        <h3>
+            <i class="fas fa-users"></i> 
+            Пилоты тренировки: {{ training.location }}
+        </h3>
+        <div class="training-info">
+            <span class="info-item">
+                <i class="fas fa-map-marker-alt"></i> {{ training.city }}
+            </span>
+            <span class="info-item">
+                <i class="fas fa-calendar"></i> {{ training.date }}
+            </span>
+            <span class="info-item">
+                <i class="fas fa-clock"></i> {{ training.time }}
+            </span>
+        </div>
+    </div>
+
+    {% if pilots %}
+        <div class="pilots-table-container">
+            <table class="pilots-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-user"></i> Пилот</th>
+                        <th><i class="fas fa-signal"></i> Канал</th>
+                        <th><i class="fas fa-wallet"></i> Статус</th>
+                        <th><i class="fas fa-cogs"></i> Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pilot in pilots %}
+                        <tr class="pilot-row" data-pilot-id="{{ pilot.id }}">
+                            <td class="pilot-name">
+                                <div class="name-main">{{ pilot.display_name }}</div>
+                                {% if pilot.username %}
+                                    <div class="name-username">@{{ pilot.username }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="pilot-channel">
+                                <select 
+                                    class="channel-select"
+                                    data-band="{{ pilot.vtx_band }}"
+                                    onchange="editChannel({{ pilot.id }}, this)"
+                                    title="Изменить канал"
+                                >
+                                    {% for band in ['R', 'F', 'E'] %}
+                                        {% for ch in range(1, 9) %}
+                                            <option 
+                                                value="{{ ch }}" 
+                                                {% if pilot.vtx_band == band and pilot.vtx_channel == ch %}selected{% endif %}
+                                                {% if (band, ch) in used_channels %}disabled{% endif %}
+                                            >
+                                                {{ band }}{{ ch }}
+                                                {% if (band, ch) in used_channels and not (pilot.vtx_band == band and pilot.vtx_channel == ch) %}
+                                                    (занят)
+                                                {% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="pilot-status">
+                                {% if pilot.paid %}
+                                    <span class="status-badge status-paid" title="Оплачено">
+                                        <i class="fas fa-check-circle"></i> Оплачено
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-unpaid" title="Не оплачено">
+                                        <i class="fas fa-times-circle"></i> Не оплачено
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="pilot-actions">
+                                <button 
+                                    class="btn btn-sm btn-info" 
+                                    onclick="copyPilotInfo({{ pilot.id }})"
+                                    title="Копировать информацию"
+                                >
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button 
+                                    class="btn btn-sm btn-warning" 
+                                    onclick="sendNotification({{ pilot.id }})"
+                                    title="Отправить уведомление"
+                                >
+                                    <i class="fas fa-bell"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal-footer">
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i> Всего пилотов: <strong>{{ pilots|length }}</strong>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-wallet"></i> Оплатили: <strong>{{ paid_count }}</strong>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-signal"></i> Свободных каналов: <strong>{{ free_channels }}</strong>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="no-pilots">
+            <div class="no-pilots-content">
+                <i class="fas fa-users-slash"></i>
+                <h4>Нет записавшихся пилотов</h4>
+                <p>Пилоты пока не записались на эту тренировку.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.pilots-modal-content {
+    padding: 20px;
+}
+
+.modal-header {
+    text-align: left;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.modal-header h3 {
+    color: white;
+    font-size: 1.6em;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-header h3 i {
+    font-size: 1.8em;
+}
+
+.training-info {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: #ecf0f1;
+    font-size: 0.95em;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-item i {
+    color: #3498db;
+}
+
+.pilots-table-container {
+    overflow-x: auto;
+    margin: 30px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pilots-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pilots-table th {
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9em;
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.pilots-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: middle;
+}
+
+.pilots-table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.pilots-table tr:hover {
+    background: rgba(52, 152, 219, 0.1) !important;
+}
+
+.pilot-name {
+    min-width: 200px;
+}
+
+.name-main {
+    font-weight: 600;
+    color: white;
+    font-size: 1.1em;
+}
+
+.name-username {
+    color: #95a5a6;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.pilot-channel .channel-select {
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.95em;
+    cursor: pointer;
+    min-width: 100px;
+    transition: all 0.3s ease;
+}
+
+.pilot-channel .channel-select:focus {
+    outline: none;
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.pilot-channel .channel-select option:disabled {
+    color: #e74c3c;
+}
+
+.pilot-status .status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-paid {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.status-unpaid {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.pilot-actions .btn {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    margin: 0 5px;
+}
+
+.modal-footer {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(255,255,255,0.1);
+}
+
+.stats-summary {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: #ecf0f1;
+    font-size: 1.1em;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    min-width: 180px;
+    justify-content: center;
+}
+
+.stat-item i {
+    font-size: 1.3em;
+    color: #3498db;
+}
+
+.stat-item strong {
+    color: white;
+    font-size: 1.3em;
+}
+
+/* Нет пилотов */
+.no-pilots {
+    text-align: center;
+    padding: 60px 20px;
+    color: #95a5a6;
+}
+
+.no-pilots-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.no-pilots-content i {
+    font-size: 4em;
+    color: #95a5a6;
+}
+
+.no-pilots-content h4 {
+    color: white;
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.no-pilots-content p {
+    color: #ecf0f1;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .modal-header h3 {
+        font-size: 1.4em;
+    }
+    
+    .training-info {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .pilots-table th,
+    .pilots-table td {
+        padding: 12px 15px;
+        font-size: 0.9em;
+    }
+    
+    .pilot-name {
+        min-width: 150px;
+    }
+    
+    .stats-summary {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.pilots-modal-content {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.pilot-row {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Дополнительные стили для каналов */
+.channel-select option:checked {
+    font-weight: bold;
+    background: #3498db !important;
+    color: white !important;
+}
+</style>
+
+<script>
+// Функция редактирования канала (вызывается из dashboard.html)
+function editChannel(regId, elem) {
+    const band = elem.dataset.band;
+    const channel = elem.value;
+    
+    fetch('/admin/edit-channel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `reg_id=${regId}&band=${band}&channel=${channel}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Обновляем визуальное состояние
+            elem.style.background = 'rgba(46, 204, 113, 0.2)';
+            setTimeout(() => {
+                elem.style.background = '';
+            }, 1000);
+        } else {
+            alert('Ошибка: ' + data.message);
+            // Возвращаем предыдущее значение
+            elem.value = elem.dataset.previousValue || elem.value;
+        }
+    })
+    .catch(error => {
+        alert('Ошибка при обновлении канала');
+        console.error('Error:', error);
+        elem.value = elem.dataset.previousValue || elem.value;
+    });
+}
+
+// Функция копирования информации о пилоте
+function copyPilotInfo(pilotId) {
+    const row = document.querySelector(`.pilot-row[data-pilot-id="${pilotId}"]`);
+    const name = row.querySelector('.name-main').textContent;
+    const channelSelect = row.querySelector('.channel-select');
+    const band = channelSelect.dataset.band;
+    const channel = channelSelect.value;
+    const status = row.querySelector('.status-badge').textContent;
+    
+    const text = `Пилот: ${name}\nКанал: ${band}${channel}\nСтатус: ${status}`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Информация скопирована в буфер обмена!');
+    }).catch(err => {
+        console.error('Ошибка копирования: ', err);
+        alert('Не удалось скопировать информацию');
+    });
+}
+
+// Функция отправки уведомления пилоту
+function sendNotification(pilotId) {
+    if (confirm('Отправить уведомление этому пилоту?')) {
+        fetch(`/admin/notify-pilot/${pilotId}`, {
+            method: 'POST',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Уведомление отправлено!');
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Ошибка при отправке уведомления');
+            console.error('Error:', error);
+        });
+    }
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    // Сохраняем предыдущее значение для отката при ошибке
+    document.querySelectorAll('.channel-select').forEach(select => {
+        select.dataset.previousValue = select.value;
+        select.addEventListener('change', function() {
+            this.dataset.previousValue = this.value;
+        });
+    });
+    
+    // Плавное появление
+    setTimeout(() => {
+        document.querySelector('.pilots-modal-content').style.opacity = '1';
+    }, 100);
+});
+</script>

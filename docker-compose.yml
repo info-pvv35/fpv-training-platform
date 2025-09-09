@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fpv-db
+    restart: always
+    environment:
+      POSTGRES_DB: fpv_bot
+      POSTGRES_USER: fpv_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pg_/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fpv-net
+
+  bot:
+    build: ./bot
+    container_name: fpv-bot
+    restart: always
+    env_file: .env
+    depends_on:
+      - db
+    networks:
+      - fpv-net
+
+  web:
+    build: ./web
+    container_name: fpv-web
+    restart: always
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - fpv-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: fpv-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - web
+    networks:
+      - fpv-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fpv-prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - web
+    networks:
+      - fpv-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fpv-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - fpv-net
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: fpv-alertmanager
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - fpv-net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: fpv-cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8080:8080"
+    privileged: true
+    networks:
+      - fpv-net
+
+volumes:
+  pg_
+  grafana_
+
+networks:
+  fpv-net:
+    driver: bridge

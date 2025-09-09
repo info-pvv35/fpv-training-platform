@@ -1,0 +1,499 @@
+/* static/admin.css — Стили для админ-панели FPV Training Platform */
+
+/* ========================
+   ОБЩИЕ СТИЛИ
+======================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    margin: 0;
+    padding: 0;
+    color: #333;
+    min-height: 100vh;
+}
+
+.admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+/* ========================
+   ЗАГОЛОВКИ И НАВИГАЦИЯ
+======================== */
+
+h1, h2, h3 {
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 2.2em;
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: #e74c3c;
+    color: white;
+    padding: 8px 20px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* ========================
+   ФОРМЫ И КНОПКИ
+======================== */
+
+form {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+button, .btn {
+    padding: 12px 24px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    margin: 5px 0;
+}
+
+button:hover, .btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-info {
+    background: #3498db;
+}
+
+.btn-info:hover {
+    background: #2980b9;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-success {
+    background: #2ecc71;
+}
+
+.btn-success:hover {
+    background: #27ae60;
+}
+
+/* ========================
+   ТАБЛИЦЫ
+======================== */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.95em;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.table th {
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.table tr:hover {
+    background: rgba(52, 152, 219, 0.2);
+}
+
+/* ========================
+   КАРТОЧКИ ТРЕНИРОВОК
+======================== */
+
+.training-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-left: 5px solid #3498db;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.training-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-left-color: #2ecc71;
+}
+
+.training-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.training-card h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.meta span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: #ecf0f1;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta .date { background: #34495e; }
+.meta .time { background: #2ecc71; }
+.meta .track { background: #9b59b6; }
+.meta .spots { background: #e67e22; }
+
+/* ========================
+   МОДАЛЬНЫЕ ОКНА
+======================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    overflow: auto;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    margin: 5% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: white;
+}
+
+/* ========================
+   АУДИТ
+======================== */
+
+.audit-log {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px 0;
+}
+
+.audit-log pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    color: #ecf0f1;
+    font-size: 0.9em;
+}
+
+/* ========================
+   ПРОФИЛЬ
+======================== */
+
+.profile-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.profile-section h3 {
+    color: white;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+/* ========================
+   АЛЕРТЫ И УВЕДОМЛЕНИЯ
+======================== */
+
+.alert {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-success {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border-left: 4px solid #2ecc71;
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-left: 4px solid #e74c3c;
+}
+
+.alert-warning {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+    border-left: 4px solid #f1c40f;
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border-left: 4px solid #3498db;
+}
+
+/* ========================
+   ФИЛЬТРЫ И ПОИСК
+======================== */
+
+.filters {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 25px 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.filters label {
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filters select, .filters input {
+    min-width: 200px;
+}
+
+/* ========================
+   FOOTER
+======================== */
+
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9em;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 50px;
+}
+
+/* ========================
+   АДАПТИВНЫЙ ДИЗАЙН
+======================== */
+
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .logout-btn {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    
+    form {
+        padding: 20px;
+    }
+    
+    input, select, button {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    
+    .meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .meta span {
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filters select, .filters input {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* ========================
+   АНИМАЦИИ
+======================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.training-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Дополнительные стили для треков */
+.track.race { background: #e74c3c !important; }
+.track.freestyle { background: #3498db !important; }
+.track.low { background: #9b59b6 !important; }
+.track.tech { background: #2ecc71 !important; }
+.track.cinematic { background: #1abc9c !important; }
+.track.training { background: #f1c40f !important; }
+.track.other { background: #95a5a6 !important; }
+
+/* Стили для статуса оплаты */
+.paid-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.paid-yes {
+    background: #2ecc71;
+}
+
+.paid-no {
+    background: #e74c3c;
+}

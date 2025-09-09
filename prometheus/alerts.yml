@@ -1,0 +1,201 @@
+# prometheus/alerts.yml — Правила алертинга для FPV Training Platform
+
+groups:
+  - name: fpv-platform-alerts
+    rules:
+
+      # =============
+      # СЕРВИСЫ
+      # =============
+
+      - alert: FPVServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "Сервис {{ $labels.instance }} упал"
+          description: "Сервис `{{ $labels.job }}` на `{{ $labels.instance }}` не отвечает уже более 1 минуты. Требуется срочное вмешательство."
+
+      - alert: FPVServiceHighLatency
+        expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 2
+        for: 3m
+        labels:
+          severity: warning
+          service: web
+        annotations:
+          summary: "Высокая задержка веб-сервиса"
+          description: "Средняя задержка ответа веб-сервиса превысила 2 секунды за последние 5 минут."
+
+      # =============
+      # БАЗА ДАННЫХ
+      # =============
+
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL недоступна"
+          description: "База данных PostgreSQL не отвечает. Все сервисы могут быть недоступны."
+
+      - alert: PostgreSQLHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Слишком много подключений к PostgreSQL"
+          description: "Количество активных подключений к БД: {{ $value }}. Порог: 80."
+
+      - alert: PostgreSQLSlowQueries
+        expr: rate(pg_stat_database_blks_read[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Медленные запросы к PostgreSQL"
+          description: "Высокая скорость чтения блоков из диска — возможно, не хватает индексов или памяти."
+
+      # =============
+      # РЕСУРСЫ
+      # =============
+
+      - alert: HighCPUUsage
+        expr: (100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Высокая загрузка CPU на {{ $labels.instance }}"
+          description: "Загрузка CPU превысила 85% в течение 10 минут. Текущее значение: {{ $value }}%."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Высокое использование памяти на {{ $labels.instance }}"
+          description: "Использование памяти превысило 90%. Текущее значение: {{ $value }}%."
+
+      - alert: HighDiskUsage
+        expr: (node_filesystem_size_bytes{fstype!="tmpfs",mountpoint!="/boot"} - node_filesystem_free_bytes{fstype!="tmpfs",mountpoint!="/boot"}) / node_filesystem_size_bytes{fstype!="tmpfs",mountpoint!="/boot"} * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Диск почти заполнен на {{ $labels.instance }}"
+          description: "Использование диска превысило 85%. Текущее значение: {{ $value }}%."
+
+      # =============
+      # КОНТЕЙНЕРЫ
+      # =============
+
+      - alert: ContainerDown
+        expr: container_last_seen == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: docker
+        annotations:
+          summary: "Контейнер {{ $labels.name }} упал"
+          description: "Контейнер `{{ $labels.name }}` на `{{ $labels.instance }}` не отвечает."
+
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes{container!="",container!="POD"} / container_spec_memory_limit_bytes{container!="",container!="POD"} * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: docker
+        annotations:
+          summary: "Контейнер {{ $labels.container }} использует слишком много памяти"
+          description: "Использование памяти контейнером превысило 90%. Текущее значение: {{ $value }}%."
+
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total{container!="",container!="POD"}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: docker
+        annotations:
+          summary: "Контейнер {{ $labels.container }} использует слишком много CPU"
+          description: "Использование CPU контейнером превысило 80%. Текущее значение: {{ $value }}%."
+
+      # =============
+      # TELEGRAM-БОТ
+      # =============
+
+      - alert: FPVBotNotResponding
+        expr: absent(up{job="fpv-bot"}) == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: telegram-bot
+        annotations:
+          summary: "Telegram-бот не отвечает"
+          description: "Бот FPV Training Platform недоступен. Пилоты не могут записываться на тренировки."
+
+      # =============
+      # ВЕБ-СЕРВИС
+      # =============
+
+      - alert: FPVWebNotResponding
+        expr: absent(up{job="fpv-web"}) == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: web
+        annotations:
+          summary: "Веб-сервис не отвечает"
+          description: "Веб-интерфейс расписания недоступен. Пилоты не могут просматривать тренировки."
+
+      # =============
+      # ПЛАТЕЖИ
+      # =============
+
+      - alert: PaymentProcessingFailure
+        expr: rate(http_requests_total{status=~"5..",handler="/api/payment"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+          component: payments
+        annotations:
+          summary: "Ошибки при обработке платежей"
+          description: "Обнаружены HTTP 5xx ошибки в эндпоинте платежей. Пилоты не могут оплачивать тренировки."
+
+      # =============
+      # ЗАПИСЬ НА ТРЕНИРОВКИ
+      # =============
+
+      - alert: RegistrationFailure
+        expr: rate(http_requests_total{status=~"5..",handler=~".*/register.*"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          component: registrations
+        annotations:
+          summary: "Ошибки при записи на тренировки"
+          description: "Обнаружены HTTP 5xx ошибки при попытке записи на тренировку."
+
+      # =============
+      # 2FA / АДМИНКА
+      # =============
+
+      - alert: AdminPanelFailure
+        expr: rate(http_requests_total{status=~"5..",handler=~".*/admin.*"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          component: admin
+        annotations:
+          summary: "Ошибки в админ-панели"
+          description: "Обнаружены HTTP 5xx ошибки в админ-панели. Администраторы не могут управлять платформой."

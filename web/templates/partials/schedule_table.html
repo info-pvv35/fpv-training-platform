@@ -1,0 +1,540 @@
+<!-- templates/partials/schedule_table.html -->
+{% for city, trainings_in_city in schedule %}
+    <div class="city-section" data-city="{{ city }}">
+        <h2 class="city-title">
+            <i class="fas fa-city"></i> {{ city }}
+        </h2>
+        
+        {% if trainings_in_city %}
+            <div class="trainings-grid">
+                {% for training in trainings_in_city %}
+                    <div class="training-card {% if training.is_past %}past{% endif %}" id="training-{{ training.id }}">
+                        <div class="card-header">
+                            <h3 class="location-name">{{ training.location }}</h3>
+                            <div class="spots-badge">
+                                <i class="fas fa-user-friends"></i>
+                                {{ training.current_pilots }}/{{ training.max_pilots }}
+                            </div>
+                        </div>
+                        
+                        <div class="card-meta">
+                            <div class="meta-item date-item">
+                                <i class="fas fa-calendar"></i>
+                                <span class="date-text">{{ training.date }}</span>
+                            </div>
+                            <div class="meta-item time-item">
+                                <i class="fas fa-clock"></i>
+                                <span class="time-text">{{ training.time }}</span>
+                            </div>
+                            <div class="meta-item track-item">
+                                <i class="fas fa-flag-checkered"></i>
+                                <span class="track-badge {{ training.track_type }}">{{ TRACK_TYPES.get(training.track_type, '❓') }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if training.pilots %}
+                            <div class="pilots-section">
+                                <h4 class="pilots-title">
+                                    <i class="fas fa-users"></i> Записавшиеся пилоты ({{ training.pilots|length }})
+                                </h4>
+                                <div class="pilots-list">
+                                    {% for pilot in training.pilots %}
+                                        <div class="pilot-item">
+                                            <div class="pilot-info">
+                                                <span class="pilot-name">{{ pilot.display_name }}</span>
+                                                <span class="pilot-channel">
+                                                    <i class="fas fa-signal"></i>
+                                                    {{ pilot.vtx_band }}{{ pilot.vtx_channel }}
+                                                </span>
+                                            </div>
+                                            {% if pilot.paid %}
+                                                <span class="paid-badge" title="Оплачено">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="no-pilots">
+                                <i class="fas fa-users-slash"></i>
+                                <span>Пока никто не записался</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-trainings">
+                <i class="fas fa-calendar-times"></i>
+                <p>В этом городе пока нет запланированных тренировок</p>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% if not schedule %}
+    <div class="no-cities">
+        <div class="no-cities-content">
+            <i class="fas fa-search"></i>
+            <h3>Нет тренировок</h3>
+            <p>В данный момент нет запланированных тренировок. Проверьте позже или свяжитесь с администратором.</p>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+/* Секция города */
+.city-section {
+    margin-bottom: 50px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.city-title {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 25px;
+    border-radius: 15px 15px 0 0;
+    margin: 0 -40px 30px -40px;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.city-title i {
+    font-size: 1.5em;
+}
+
+/* Сетка тренировок */
+.trainings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Карточка тренировки */
+.training-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #ecf0f1;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.training-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.training-card.past {
+    opacity: 0.7;
+    border-left: 5px solid #e74c3c;
+    background: #fdf2f2;
+}
+
+.training-card.past::before {
+    content: 'Завершено';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #e74c3c;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    z-index: 1;
+}
+
+/* Заголовок карточки */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.location-name {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.spots-badge {
+    background: #3498db;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.95em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
+}
+
+/* Мета-информация */
+.card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-top: 1px solid #ecf0f1;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #7f8c8d;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.meta-item i {
+    font-size: 1.2em;
+    color: #3498db;
+}
+
+.date-text, .time-text {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Типы трасс */
+.track-badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: white;
+    display: inline-block;
+}
+
+.track-badge.race { background: #e74c3c; }
+.track-badge.freestyle { background: #3498db; }
+.track-badge.low { background: #9b59b6; }
+.track-badge.tech { background: #2ecc71; }
+.track-badge.cinematic { background: #1abc9c; }
+.track-badge.training { background: #f1c40f; color: #2c3e50; }
+.track-badge.other { background: #95a5a6; }
+
+/* Секция пилотов */
+.pilots-section {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 2px dashed #ecf0f1;
+}
+
+.pilots-title {
+    color: #2c3e50;
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pilots-list {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #ecf0f1;
+}
+
+.pilot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.pilot-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.pilot-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.pilot-name {
+    color: #2c3e50;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.pilot-channel {
+    color: #e67e22;
+    font-size: 0.95em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paid-badge {
+    color: #2ecc71;
+    font-size: 1.3em;
+    background: none;
+    border: none;
+    cursor: default;
+}
+
+/* Нет пилотов */
+.no-pilots {
+    text-align: center;
+    padding: 30px;
+    color: #95a5a6;
+    font-style: italic;
+    font-size: 1.1em;
+    background: #fafafa;
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 2px dashed #ecf0f1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.no-pilots i {
+    font-size: 2.5em;
+}
+
+/* Нет тренировок в городе */
+.no-trainings {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+    font-size: 1.2em;
+    background: #f8f9fa;
+    border-radius: 15px;
+    margin: 30px 0;
+    border: 2px dashed #d5dbdb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.no-trainings i {
+    font-size: 3em;
+    color: #bdc3c7;
+}
+
+/* Нет городов */
+.no-cities {
+    text-align: center;
+    padding: 60px 20px;
+    color: #e74c3c;
+    font-size: 1.4em;
+    font-weight: 500;
+    background: #fdf2f2;
+    border-radius: 20px;
+    margin: 50px 0;
+    border: 3px solid #f5c6cb;
+}
+
+.no-cities-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.no-cities-content i {
+    font-size: 4em;
+    color: #e74c3c;
+}
+
+.no-cities-content h3 {
+    color: #c0392b;
+    font-size: 2em;
+    margin: 0;
+}
+
+.no-cities-content p {
+    color: #7f8c8d;
+    font-size: 1.2em;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .trainings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .location-name {
+        font-size: 1.3em;
+    }
+    
+    .card-meta {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .meta-item {
+        justify-content: center;
+    }
+    
+    .pilot-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .pilot-name, .pilot-channel {
+        margin: 0;
+    }
+    
+    .city-title {
+        font-size: 1.5em;
+        padding: 20px;
+        margin: 0 -30px 25px -30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .training-card {
+        padding: 20px;
+    }
+    
+    .location-name {
+        font-size: 1.2em;
+    }
+    
+    .spots-badge {
+        padding: 6px 12px;
+        font-size: 0.9em;
+    }
+    
+    .card-meta {
+        padding: 15px 0;
+    }
+    
+    .pilots-title {
+        font-size: 1.1em;
+    }
+    
+    .pilot-item {
+        padding: 12px 0;
+    }
+    
+    .pilot-name {
+        font-size: 1em;
+    }
+    
+    .city-title {
+        font-size: 1.3em;
+        padding: 15px;
+        margin: 0 -20px 20px -20px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.city-section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.training-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* HTMX индикаторы */
+.htmx-swapping .training-card {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+/* Дополнительные стили для иконок */
+.fas.fa-city { color: #3498db; }
+.fas.fa-users { color: #2ecc71; }
+.fas.fa-calendar { color: #9b59b6; }
+.fas.fa-clock { color: #f39c12; }
+.fas.fa-flag-checkered { color: #e74c3c; }
+.fas.fa-signal { color: #9b59b6; }
+.fas.fa-check-circle { color: #2ecc71; }
+.fas.fa-users-slash { color: #95a5a6; }
+.fas.fa-search { color: #e74c3c; }
+.fas.fa-calendar-times { color: #bdc3c7; }
+</style>
+
+<script>
+// HTMX события для плавного обновления
+document.addEventListener('htmx:beforeSwap', function(evt) {
+    if (evt.detail.target.id === 'schedule-container') {
+        // Добавляем класс для плавного исчезновения
+        evt.detail.target.classList.add('htmx-swapping');
+    }
+});
+
+document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'schedule-container') {
+        // Убираем класс после обновления
+        evt.detail.target.classList.remove('htmx-swapping');
+        
+        // Прокручиваем к началу, если это новая страница
+        if (window.location.hash) {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }
+});
+
+// Плавное появление при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        document.querySelectorAll('.city-section').forEach((section, index) => {
+            setTimeout(() => {
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    }, 100);
+});
+</script>

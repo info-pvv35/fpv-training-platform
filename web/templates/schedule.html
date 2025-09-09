@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru" hx-ext="sse">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPV Тренировки — Расписание</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Подключаем HTMX и SSE extension -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Расписание FPV-тренировок</h1>
+        <p class="last-updated">Обновлено: <span id="current-time"></span></p>
+
+        <!-- Фильтр по городам -->
+        <div class="filters">
+            <label for="cityFilter">Фильтр по городу:</label>
+            <select id="cityFilter" onchange="filterByCity()">
+                <option value="">Все города</option>
+                {% for city in cities %}
+                    <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Контейнер с расписанием (обновляется через HTMX) -->
+        <div id="schedule-container"
+             hx-sse="connect:/updates"
+             hx-trigger="sse:refresh"
+             hx-get="/schedule-partial"
+             hx-swap="innerHTML"
+             hx-indicator="#loading-indicator">
+            
+            <!-- Сюда подставится содержимое из schedule-partial.html -->
+            {% include 'partials/schedule_table.html' %}
+            
+        </div>
+
+        <!-- Индикатор загрузки -->
+        <div id="loading-indicator" class="htmx-indicator" style="text-align: center; margin: 20px 0; display: none;">
+            <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        </div>
+
+        <p class="auto-update">Автообновление каждые 30 секунд. Последнее обновление: <span id="last-update">сейчас</span></p>
+
+        <!-- Ссылка на админку (если пользователь админ) -->
+        {% if is_admin %}
+            <a href="/admin" class="admin-link">🔐 Админ-панель</a>
+        {% endif %}
+
+        <!-- QR-код для удобного доступа -->
+        <div class="qr-section">
+            <h3>📱 Откройте на телефоне</h3>
+            <img src="/static/qr-schedule.png" alt="QR-код расписания" style="max-width: 200px; border-radius: 10px;">
+            <p>Отсканируйте QR-код или сохраните эту страницу в закладки!</p>
+        </div>
+
+        <!-- Ссылка на политику конфиденциальности -->
+        <footer>
+            <p>
+                <a href="/privacy">📜 Политика конфиденциальности</a> | 
+                <a href="https://t.me/ваш_бот" target="_blank">🤖 Наш Telegram-бот</a>
+            </p>
+            <p>© {{ now().year }} FPV Training Platform. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .htmx-indicator {
+            display: none;
+        }
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+    </style>
+
+    <script>
+        // Обновление времени
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString('ru-RU');
+            document.getElementById('last-update').textContent = "сейчас";
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Обновляем last-update при каждом обновлении HTMX
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if (evt.detail.target.id === 'schedule-container') {
+                document.getElementById('last-update').textContent = "только что";
+                setTimeout(() => {
+                    document.getElementById('last-update').textContent = "30 сек назад";
+                }, 30000);
+            }
+        });
+
+        // Фильтрация по городам
+        function filterByCity() {
+            const city = document.getElementById('cityFilter').value;
+            const sections = document.querySelectorAll('.city-section');
+            
+            sections.forEach(section => {
+                if (city === "" || section.querySelector('.city-title').textContent.includes(city)) {
+                    section.style.display = 'block';
+                    section.style.opacity = '0';
+                    setTimeout(() => {
+                        section.style.transition = 'opacity 0.5s ease';
+                        section.style.opacity = '1';
+                    }, 50);
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Плавное появление при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('.container').style.opacity = '1';
+                document.querySelector('.container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
