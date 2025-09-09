@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+venv/
+.venv/
+
+# Logs
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# Local DB
+fpv_bot.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
