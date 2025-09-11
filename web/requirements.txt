@@ -5,3 +5,8 @@ python-dotenv
 gunicorn
 qrcode[pil]
 htmx
+pytz
+reportlab
+alembic
+asyncpg
+psycopg2-binary

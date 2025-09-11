@@ -95,7 +95,10 @@ def schedule():
 
     schedule_data = sorted(city_groups.items(), key=lambda x: x[0])
 
-    return render_template('schedule.html', schedule=schedule_data, TRACK_TYPES=TRACK_TYPES)
+    return render_template('schedule.html',
+                       schedule=schedule_data,
+                       TRACK_TYPES=TRACK_TYPES,
+                       year=datetime.now().year)
 
 # Маршрут для HTMX-обновления
 @app.route('/schedule-partial')
