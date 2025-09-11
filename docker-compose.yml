@@ -14,18 +14,24 @@ services:
       - "5432:5432"
     networks:
       - fpv-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fpv_user -d fpv_bot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   bot:
     build:
-      command: python -m bot.bot
       context: .
       dockerfile: docker/bot.Dockerfile
+    command: python -m bot.bot
     env_file:
       - .env
     ports:
       - "8080:8080"  # для вебхуков
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - fpv-net
@@ -33,14 +39,17 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/bot.Dockerfile
+      dockerfile: docker/web.Dockerfile
     command: uvicorn bot.web.app:app --host 0.0.0.0 --port 8000
     env_file:
       - .env
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:              # ← ДОБАВЬТЕ ЭТО
+      - fpv-net
 
   nginx:
     image: nginx:alpine
@@ -102,11 +111,23 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     ports:
-      - "8080:8080"
+      - "8081:8080"
     privileged: true
     networks:
       - fpv-net
-
+  backup:
+    build:
+      context: .
+      dockerfile: docker/backup/Dockerfile
+    env_file:
+      - .env
+    volumes:
+    - ./backups/postgres:/backups
+    - ./logs/backup:/var/log
+    depends_on:
+    - db
+    networks:
+      - fpv-net
 volumes:
   pg_data:
   grafana_data:

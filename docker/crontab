@@ -1,0 +1,8 @@
+# Каждые 6 часов
+0 */6 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
+
+# Каждую неделю в воскресенье в 03:00
+#0 3 * * 0 /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
+
+# Каждый час (для теста)
+#0 * * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
