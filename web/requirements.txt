@@ -10,3 +10,4 @@ reportlab
 alembic
 asyncpg
 psycopg2-binary
+requests
