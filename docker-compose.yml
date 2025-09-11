@@ -10,30 +10,37 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
     networks:
       - fpv-net
 
   bot:
-    build: ./bot
-    container_name: fpv-bot
-    restart: always
-    env_file: .env
+    build:
+      command: python -m bot.bot
+      context: .
+      dockerfile: docker/bot.Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"  # для вебхуков
     depends_on:
       - db
+    restart: unless-stopped
     networks:
       - fpv-net
 
   web:
-    build: ./web
-    container_name: fpv-web
-    restart: always
-    env_file: .env
+    build:
+      context: .
+      dockerfile: docker/bot.Dockerfile
+    command: uvicorn bot.web.app:app --host 0.0.0.0 --port 8000
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:
       - db
-    networks:
-      - fpv-net
 
   nginx:
     image: nginx:alpine

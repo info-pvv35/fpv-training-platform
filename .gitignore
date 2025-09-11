@@ -23,3 +23,6 @@ fpv_bot.db
 *.swp
 *~
 .DS_Store
+*.pyc
+node_modules/
+postgres_data/
