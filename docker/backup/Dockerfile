@@ -4,8 +4,8 @@ FROM postgres:15-alpine
 RUN apk add --no-cache curl
 
 # Копируем скрипт и crontab
-COPY backup.sh /usr/local/bin/backup.sh
-COPY crontab /etc/crontabs/root
+COPY docker/backup/backup.sh /usr/local/bin/backup.sh
+COPY docker/backup/crontab /etc/crontabs/root
 
 # Даём права
 RUN chmod +x /usr/local/bin/backup.sh

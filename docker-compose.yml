@@ -48,7 +48,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:              # ← ДОБАВЬТЕ ЭТО
+    networks:              
       - fpv-net
 
   nginx:
@@ -122,10 +122,10 @@ services:
     env_file:
       - .env
     volumes:
-    - ./backups/postgres:/backups
-    - ./logs/backup:/var/log
+      - ./backups/postgres:/backups
+      - ./logs/backup:/var/log
     depends_on:
-    - db
+      - db
     networks:
       - fpv-net
 volumes:

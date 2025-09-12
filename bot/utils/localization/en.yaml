@@ -1,21 +1,19 @@
+---
 start:
   hello: "Hi! I'm FPV Training Bot. Choose action:"
 consent:
-  title: "📜 Privacy Policy"
+  title: 📜 Privacy Policy
   body: |
     We collect minimal necessary data:
     - Telegram ID
     - Nickname
     - VTX Channel
-  agree: "✅ I agree"
-  thanks: "✅ Thank you!"
+  agree: ✅ I agree
+  thanks: ✅ Thank you!
 buttons:
-  schedule: "📅 Schedule"
-  register: "✏️ Register"
-  cancel: "❌ Cancel registration"
-  web: "🌐 Web schedule"
-voice:
-  transcribed: "🎤 Recognized: _{text}_"
-  executing: "✅ Executing command: `{command}`"
-  not_understood: "❌ Didn't understand: {text}"
-  error: "❌ Voice processing error: {error}"
+  schedule: 📅 Schedule
+  search: 🔍 Search
+  register: ✏️ Register
+  cancel: ❌ Cancel registration
+  stats: 📊 Stats
+  web: 🌐 Web Schedule

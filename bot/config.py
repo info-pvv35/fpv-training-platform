@@ -16,3 +16,8 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
 SCHEDULE_URL = os.getenv("SCHEDULE_URL", "https://example.com/schedule")
 SENTRY_DSN = os.getenv("SENTRY_DSN", "")
 TIMEZONE = os.getenv("TIMEZONE", "Europe/Moscow")
+
+YOOKASSA_SHOP_ID = os.getenv("YOOKASSA_SHOP_ID", "")
+YOOKASSA_SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY", "")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")

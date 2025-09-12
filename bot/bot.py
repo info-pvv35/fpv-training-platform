@@ -1,10 +1,12 @@
 import asyncio
 import logging
 import signal
+import os
 from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiogram_i18n import I18nMiddleware
-from aiogram_i18n.cores import YamlCore
+from aiogram_i18n.cores import FluentRuntimeCore as YamlCore   # alias для совместимости
+from aiogram_i18n.exceptions import NoLocalesError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiohttp import web
 from .config import (
@@ -91,9 +93,31 @@ async def main():
     bot.scheduler = scheduler  # Привязываем к боту для доступа в хендлерах
     logger.info("✅ Scheduler started")
 
+    
+    
     # Настройка интернационализации
+    base_dir = os.path.dirname(os.path.abspath(__file__))  # /app/bot
+    localization_path = os.path.join(base_dir, "utils", "localization")  # /app/bot/utils/localization
+
+    print(f"📂 Абсолютный путь к localization: {localization_path}")
+    print(f"📄 Файлы в папке: {os.listdir(localization_path)}")
+
+    try:
+        core = YamlCore(path=localization_path)
+        # Принудительно загружаем локали
+        core.default_locale = "ru"
+        
+        #core.load()
+        logger.info(f"✅ Загруженные локали: {list(core.locales)}")
+    except NoLocalesError as e:
+        logger.info(f"❌ Ошибка загрузки локалей: {e}")
+        raise
+    except Exception as e:
+        logger.info(f"💥 Неизвестная ошибка: {e}")
+        raise
+
     i18n_middleware = I18nMiddleware(
-        core=YamlCore(path="bot/utils/localization/{locale}.yaml"),
+        core=core,
         default_locale="ru",
     )
     i18n_middleware.setup(dp)

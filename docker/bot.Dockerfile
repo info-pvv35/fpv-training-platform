@@ -24,7 +24,7 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR /app
 
 # 💡 Копируем requirements первым — для кэширования слоёв
-COPY requirements.txt .
+COPY bot/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 💡 Копируем всё остальное
@@ -34,7 +34,8 @@ COPY . .
 RUN mkdir -p /app/temp
 
 # 💡 Устанавливаем шрифт DejaVu для PDF с кириллицей
-RUN wget -O /app/DejaVuSans.ttf https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans.ttf
+COPY DejaVuSans.ttf .
+#RUN wget -O /app/DejaVuSans.ttf https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans.ttf
 
 # 💡 Открываем порты:
 # - 8080 — для вебхуков Telegram и платежей

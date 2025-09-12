@@ -7,7 +7,8 @@ from aiogram.types import (
     Message, PreCheckoutQuery, LabeledPrice, InlineKeyboardButton,
     InlineKeyboardMarkup, WebAppInfo, CallbackQuery
 )
-from aiogram.filters import ContentTypeFilter, Command
+from aiogram.filters import Command
+#from aiogram.filters import ContentTypesFilter
 from aiogram.enums import ContentType
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
